@@ -29,15 +29,18 @@ void *myalloc(int size){
 
     struct block *temp=head;
     while(temp){
-        if(temp->in_use==0&&temp->size>=size){ 
+        if(temp->in_use==0&&temp->size>=size){              //block is free and large enough
             temp->in_use=1;
+
             if((long unsigned int)temp->size>=(PADDED_SIZE(size)+PADDED_SIZE(sizeof(struct block))+16)){
+                
+                //makes a new block if enough size is left over
                 struct block *new=PTR_OFFSET(temp,PADDED_SIZE(sizeof(struct block))+PADDED_SIZE(size));
                 new->in_use=0;
                 new->size=temp->size-PADDED_SIZE(size)-PADDED_SIZE(sizeof(struct block));
                 temp->size=PADDED_SIZE(size);
                 new->next=temp->next;
-                temp->next=new;
+                temp->next=new;                             
             }
             return PTR_OFFSET(temp,PADDED_SIZE(sizeof(struct block)));
         }
@@ -50,7 +53,7 @@ void coalesce(){
     struct block *temp=head;
 
     while(temp->next){
-        if(!temp->in_use&&!temp->next->in_use){
+        if(!temp->in_use&&!temp->next->in_use){             //combines any two adjacent free blocks
             temp->size=temp->size+PADDED_SIZE(sizeof(struct block))+temp->next->size;
             temp->next=temp->next->next;
         }
@@ -67,7 +70,7 @@ void myfree(void *p){
         if(PTR_OFFSET(temp,PADDED_SIZE(sizeof(struct block)))==p){
             temp->in_use=0;
             temp=NULL;
-            coalesce();
+            coalesce();         
         }else{
             temp=temp->next;
         }
@@ -98,11 +101,11 @@ void print_data(void)
 }
 
 int main(){
-    
+    /*
     void *p;
     p = myalloc(10); print_data();
     myfree(p); print_data();
-    
+    */
 
     /*
     void *p, *q;
@@ -132,5 +135,5 @@ int main(){
     myfree(p); print_data();
     myfree(s); print_data();
     myfree(r); print_data();
-    */    
+    */
 }
